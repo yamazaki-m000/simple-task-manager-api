@@ -3,6 +3,9 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   Simple Task Manager API
 
+# ------------------------------------------------------------
+# Globals section
+# ------------------------------------------------------------
 Globals:
   Function:
     Runtime: python3.7
@@ -11,7 +14,11 @@ Globals:
       Variables:
         TABLE_NAME: data-table
 
+# ------------------------------------------------------------
+# Resources section
+# ------------------------------------------------------------
 Resources:
+  # API Gateway
   Api:
     Type: AWS::Serverless::Api
     Properties:
@@ -27,6 +34,7 @@ Resources:
 #        CertificateArn: my-valid-cert-arn
 #        EndpointConfiguration: EDGE
 
+  # Lambda Function
   GetTasksFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -34,7 +42,7 @@ Resources:
       Handler: app.get_tasks
       CodeUri: src/tasks
       Events:
-        HelloWorld:
+        ApiEvent:
           Type: Api
           Properties:
             RestApiId: !Ref Api
@@ -48,7 +56,7 @@ Resources:
       Handler: app.create_task
       CodeUri: src/tasks
       Events:
-        HelloWorld:
+        ApiEvent:
           Type: Api
           Properties:
             RestApiId: !Ref Api
@@ -62,7 +70,7 @@ Resources:
       Handler: app.update_task
       CodeUri: src/tasks
       Events:
-        HelloWorld:
+        ApiEvent:
           Type: Api
           Properties:
             RestApiId: !Ref Api
@@ -76,13 +84,14 @@ Resources:
       Handler: app.delete_task
       CodeUri: src/tasks
       Events:
-        HelloWorld:
+        ApiEvent:
           Type: Api
           Properties:
             RestApiId: !Ref Api
             Path: /tasks/{id}
             Method: delete
 
+  # DynamoDB
   DynamoDB:
     Type: AWS::DynamoDB::Table
     Properties:
