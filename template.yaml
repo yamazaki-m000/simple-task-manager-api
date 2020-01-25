@@ -27,55 +27,12 @@ Resources:
 #        CertificateArn: my-valid-cert-arn
 #        EndpointConfiguration: EDGE
 
-#  HelloWorldFunction:
-#    Type: AWS::Serverless::Function
-#    Properties:
-#      CodeUri: src/tasks
-#      Handler: app.get_tasks
-#      Events:
-#        HelloWorld:
-#          Type: Api
-#          Properties:
-#            RestApiId: !Ref Api
-#            Path: /hello
-#            Method: get
-
   GetTasksFunction:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: get-tasks-function
-      Handler: index.lambda_handler
-      InlineCode: |
-        import json
-        def lambda_handler(event, context):
-          return {
-            "statusCode": 200,
-            "body": json.dumps({
-              "taskList": [
-                {
-                  "id": 1,
-                  "taskName": "aa",
-                  "taskDetail": "bbb",
-                  "status": 0,
-                  "priority": 2,
-                },
-                {
-                  "id": 2,
-                  "taskName": "cc",
-                  "taskDetail": "",
-                  "status": 0,
-                  "priority": 3,
-                },
-                {
-                  "id": 3,
-                  "taskName": "ddd",
-                  "taskDetail": "eee",
-                  "status": 0,
-                  "priority": 1,
-                }
-              ]
-            })
-          }
+      Handler: app.get_tasks
+      CodeUri: src/tasks
       Events:
         HelloWorld:
           Type: Api
@@ -88,14 +45,8 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: create-task-function
-      Handler: index.lambda_handler
-      InlineCode: |
-        import json
-        def lambda_handler(event, context):
-          return {
-            "statusCode": 200,
-            "body": {}
-          }
+      Handler: app.create_task
+      CodeUri: src/tasks
       Events:
         HelloWorld:
           Type: Api
@@ -108,14 +59,8 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: update-task-function
-      Handler: index.lambda_handler
-      InlineCode: |
-        import json
-        def lambda_handler(event, context):
-          return {
-            "statusCode": 200,
-            "body": {}
-          }
+      Handler: app.update_task
+      CodeUri: src/tasks
       Events:
         HelloWorld:
           Type: Api
@@ -128,14 +73,8 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: delete-task-function
-      Handler: index.lambda_handler
-      InlineCode: |
-        import json
-        def lambda_handler(event, context):
-          return {
-            "statusCode": 200,
-            "body": {},
-          }
+      Handler: app.delete_task
+      CodeUri: src/tasks
       Events:
         HelloWorld:
           Type: Api
@@ -143,3 +82,22 @@ Resources:
             RestApiId: !Ref Api
             Path: /tasks/{id}
             Method: delete
+
+  DynamoDB:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: tasks-table
+      AttributeDefinitions:
+        - AttributeName: name
+          AttributeType: S
+        - AttributeName: date
+          AttributeType: S
+      KeySchema:
+        - AttributeName: name
+          KeyType: HASH
+        - AttributeName: date
+          KeyType: RANGE
+      BillingMode: PROVISIONED
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
