@@ -20,7 +20,7 @@ Resources:
       EndpointConfiguration: REGIONAL
       Cors:
         AllowMethods: "'POST,GET,PUT,DELETE,OPTIONS'"
-        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+        AllowHeaders: "'Content-Type,X-Amz-Date,Authorization,X-Amz-Security-Token'"
         AllowOrigin: "'*'"
 #      Domain:
 #        DomainName: www.my-domain.com
@@ -38,4 +38,25 @@ Resources:
           Properties:
             RestApiId: !Ref Api
             Path: /hello
+            Method: get
+
+  InlineCodeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        import json
+        def lambda_handler(event, context):
+            return {
+                "statusCode": 200,
+                "body": json.dumps({
+                    "message": "OK",
+                }),
+            }
+      Handler: index.lambda_handler
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /inline-code
             Method: get
