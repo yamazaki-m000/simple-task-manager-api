@@ -7,6 +7,7 @@
       <list>
         <option value="profile:TASK_MANAGER" />
         <option value="profile:SREH_dev" />
+        <option value="profile:default" />
       </list>
     </option>
     <option name="recentlyUsedRegions">

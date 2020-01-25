@@ -1,7 +1,5 @@
 import json
 
-# import requests
-
 
 def get_tasks(event, context):
     return {
@@ -10,27 +8,27 @@ def get_tasks(event, context):
             "taskList": [
                 {
                   "id": 1,
-                  "taskName": "aa",
-                  "taskDetail": "bbb",
+                  "taskName": "メールを確認する",
+                  "taskDetail": "〇〇さんからメールが来てるか確認する",
                   "status": 0,
                   "priority": 2,
                 },
                 {
                   "id": 2,
-                  "taskName": "cc",
+                  "taskName": "タバコを吸う",
                   "taskDetail": "",
                   "status": 0,
                   "priority": 3,
                 },
                 {
                   "id": 3,
-                  "taskName": "ddd",
-                  "taskDetail": "eee",
+                  "taskName": "会議の資料を作成する",
+                  "taskDetail": "3/1の入沢会議に使う資料を作成する",
                   "status": 0,
                   "priority": 1,
                 }
               ]
-        }),
+        }, ensure_ascii=False),
     }
 
 
