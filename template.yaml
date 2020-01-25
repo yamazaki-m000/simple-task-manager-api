@@ -27,36 +27,119 @@ Resources:
 #        CertificateArn: my-valid-cert-arn
 #        EndpointConfiguration: EDGE
 
-  HelloWorldFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: hello_world/
-      Handler: app.lambda_handler
-      Events:
-        HelloWorld:
-          Type: Api
-          Properties:
-            RestApiId: !Ref Api
-            Path: /hello
-            Method: get
+#  HelloWorldFunction:
+#    Type: AWS::Serverless::Function
+#    Properties:
+#      CodeUri: hello_world/
+#      Handler: app.lambda_handler
+#      Events:
+#        HelloWorld:
+#          Type: Api
+#          Properties:
+#            RestApiId: !Ref Api
+#            Path: /hello
+#            Method: get
 
-  InlineCodeFunction:
+  GetTasksFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: get-tasks-function
+      Handler: index.lambda_handler
       InlineCode: |
         import json
         def lambda_handler(event, context):
-            return {
-                "statusCode": 200,
-                "body": json.dumps({
-                    "message": "OK",
-                }),
-            }
-      Handler: index.lambda_handler
+          return {
+            "statusCode": 200,
+            "body": json.dumps({
+              "taskList": [
+                {
+                  "id": 1,
+                  "taskName": "aa",
+                  "taskDetail": "bbb",
+                  "status": 0,
+                  "priority": 2,
+                },
+                {
+                  "id": 2,
+                  "taskName": "cc",
+                  "taskDetail": "",
+                  "status": 0,
+                  "priority": 3,
+                },
+                {
+                  "id": 3,
+                  "taskName": "ddd",
+                  "taskDetail": "eee",
+                  "status": 0,
+                  "priority": 1,
+                }
+              ]
+            })
+          }
       Events:
         HelloWorld:
           Type: Api
           Properties:
             RestApiId: !Ref Api
-            Path: /inline-code
+            Path: /tasks
             Method: get
+
+  CreateTaskFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: create-task-function
+      Handler: index.lambda_handler
+      InlineCode: |
+        import json
+        def lambda_handler(event, context):
+          return {
+            "statusCode": 200,
+            "body": {}
+          }
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /tasks
+            Method: post
+
+  UpdateTaskFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: update-task-function
+      Handler: index.lambda_handler
+      InlineCode: |
+        import json
+        def lambda_handler(event, context):
+          return {
+            "statusCode": 200,
+            "body": {}
+          }
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /tasks/{id}
+            Method: put
+
+  DeleteTaskFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: delete-task-function
+      Handler: index.lambda_handler
+      InlineCode: |
+        import json
+        def lambda_handler(event, context):
+          return {
+            "statusCode": 200,
+            "body": {},
+          }
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /tasks/{id}
+            Method: delete
