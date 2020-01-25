@@ -30,8 +30,8 @@ Resources:
 #  HelloWorldFunction:
 #    Type: AWS::Serverless::Function
 #    Properties:
-#      CodeUri: hello_world/
-#      Handler: app.lambda_handler
+#      CodeUri: src/tasks
+#      Handler: app.get_tasks
 #      Events:
 #        HelloWorld:
 #          Type: Api
