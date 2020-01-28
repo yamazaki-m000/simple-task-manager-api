@@ -100,7 +100,7 @@ Resources:
         - AttributeName: name
           AttributeType: S
         - AttributeName: date
-          AttributeType: S
+          AttributeType: N
       KeySchema:
         - AttributeName: name
           KeyType: HASH

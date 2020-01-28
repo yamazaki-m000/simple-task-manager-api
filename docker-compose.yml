@@ -1,0 +1,13 @@
+version: '3'
+services:
+  #  https://qiita.com/okashoi/items/f1c757279574d37b812e
+  dynamodb:
+    build: ./dynamodb
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./dynamodb_data:/home/dynamodblocal/data
+    command: -jar DynamoDBLocal.jar -dbPath ./data
+
+volumes:
+  dynamodb_data:
