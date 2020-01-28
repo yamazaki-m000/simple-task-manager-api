@@ -1,7 +1,7 @@
 import boto3
 
-# dynamodb = boto3.resource('dynamodb', region_name='ap-northeast-1', endpoint_url='http://localhost:8000')
 dynamodb = boto3.resource('dynamodb', endpoint_url='http://localhost:8000')
+
 
 def create_table():
     # Create the DynamoDB table.
