@@ -10,9 +10,9 @@ Globals:
   Function:
     Runtime: python3.7
     Timeout: 29
-    Environment:
-      Variables:
-        TABLE_NAME: data-table
+#    Environment:
+#      Variables:
+#        TABLE_NAME: data-table
 
 # ------------------------------------------------------------
 # Resources section
@@ -41,6 +41,9 @@ Resources:
       FunctionName: get-tasks-function
       Handler: app.get_tasks
       CodeUri: src/tasks
+      Layers:
+        - !Ref PythonModulesLayer
+#        - !Ref PythonLibLayer
       Events:
         ApiEvent:
           Type: Api
@@ -55,6 +58,9 @@ Resources:
       FunctionName: create-task-function
       Handler: app.create_task
       CodeUri: src/tasks
+      Layers:
+        - !Ref PythonModulesLayer
+      #        - !Ref PythonLibLayer
       Events:
         ApiEvent:
           Type: Api
@@ -69,6 +75,9 @@ Resources:
       FunctionName: update-task-function
       Handler: app.update_task
       CodeUri: src/tasks
+      Layers:
+        - !Ref PythonModulesLayer
+      #        - !Ref PythonLibLayer
       Events:
         ApiEvent:
           Type: Api
@@ -83,6 +92,9 @@ Resources:
       FunctionName: delete-task-function
       Handler: app.delete_task
       CodeUri: src/tasks
+      Layers:
+        - !Ref PythonModulesLayer
+      #        - !Ref PythonLibLayer
       Events:
         ApiEvent:
           Type: Api
@@ -91,11 +103,20 @@ Resources:
             Path: /tasks/{id}
             Method: delete
 
+  PythonModulesLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: python-modules-layer
+      ContentUri: src/layer/
+      CompatibleRuntimes:
+        - python3.7
+      RetentionPolicy: Retain
+
   # DynamoDB
   DynamoDB:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: tasks-table
+      TableName: tasks
       AttributeDefinitions:
         - AttributeName: name
           AttributeType: S
