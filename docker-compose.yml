@@ -1,13 +1,20 @@
 version: '3'
 services:
-  #  https://qiita.com/okashoi/items/f1c757279574d37b812e
-  dynamodb:
+  #  https://selmertsx.hatenablog.com/entry/2019/04/25/SAM_Local%E3%82%92%E5%88%A9%E7%94%A8%E3%81%97%E3%81%A6Local%E3%81%A7%E5%8B%95%E3%81%8B%E3%81%97%E3%81%A6%E3%81%84%E3%82%8BAWS_Lambda_%E3%81%8B%E3%82%89dynamodb-local%E3%81%AB%E3%82%A2%E3%82%AF
+  dynamodb_local:
+    container_name: dynamodb
     build: ./dynamodb
+    command: -jar DynamoDBLocal.jar -dbPath /data -sharedDb
     ports:
-      - "8000:8000"
+      - 8000:8000
     volumes:
-      - ./dynamodb_data:/home/dynamodblocal/data
-    command: -jar DynamoDBLocal.jar -dbPath ./data
+      - ./dynamodb_data:/data
+    networks:
+      - lambda_local
 
-volumes:
-  dynamodb_data:
+#volumes:
+#  dynamodb_data:
+
+networks:
+  lambda_local:
+    external: true

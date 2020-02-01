@@ -1,35 +1,37 @@
-import json
-import boto3
-
-dynamodb = boto3.resource('dynamodb', endpoint_url='http://localhost:8000')
-tasks_table = dynamodb.Table('tasks')
+import tasks_table
 
 
 def get_tasks(event, context):
-    name = event['name']
-    date = event['date']
-    response = tasks_table.get_item(
-        Key={
-            'name': name,
-            'date': date
-        }
-    )
-    return response['Item']
+    print(event)
+    print(event['queryStringParameters'])
+
+    name = event['queryStringParameters']['name']
+    date = event['queryStringParameters']['date']
+
+    tasks_list = tasks_table.get_tasks_list(name, date)
+
+    body = {'name': name, 'date': date, 'tasks_list': tasks_list}
+
+    return {
+        'statusCode': 200,
+        'body': body
+    }
 
 
 def create_task(event, context):
-    """
+    '''
     taskを作成する
 
     その日、初のtask作成の場合、itemごとDBにputする
     :param event:
     :param context:
     :return:
-    """
+    '''
+    request = event['body']
     tasks_table.put_item(
         Item={
             'name': 'yamazaki',
-            'date': 20200130,
+            'date': 20200201,
             'tasks_list': [
                 {
                     'task_id': 1,
@@ -42,13 +44,13 @@ def create_task(event, context):
         }
     )
     return {
-        "statusCode": 200,
-        "body": {}
+        'statusCode': 200,
+        'body': {}
     }
 
 
 def update_task(event, context):
-    """
+    '''
     taskの内容を更新する
 
     下記のユーザー操作がされた際に、APIコールされる
@@ -62,10 +64,10 @@ def update_task(event, context):
         task_id: 更新するtaskのid
     :param context:
     :return:
-    """
+    '''
     tasks_table.update_item(
         Key={
-            'uname': event.name,
+            'name': event.name,
             'date': event.date
         },
         UpdateExpression='SET tasks_list = :val1',
@@ -76,14 +78,14 @@ def update_task(event, context):
         }
     )
     return {
-        "statusCode": 200,
-        "body": {}
+        'statusCode': 200,
+        'body': {}
     }
 
 
 def delete_task(event, context):
 
     return {
-        "statusCode": 200,
-        "body": {}
+        'statusCode': 200,
+        'body': {}
     }
