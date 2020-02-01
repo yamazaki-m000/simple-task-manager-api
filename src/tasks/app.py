@@ -19,30 +19,26 @@ def get_tasks(event, context):
 
 
 def create_task(event, context):
-    '''
+    """
     taskを作成する
 
     その日、初のtask作成の場合、itemごとDBにputする
     :param event:
     :param context:
     :return:
-    '''
+    """
     request = event['body']
-    tasks_table.put_item(
-        Item={
-            'name': 'yamazaki',
-            'date': 20200201,
-            'tasks_list': [
-                {
-                    'task_id': 1,
-                    'task_name': 'taskname',
-                    'task_detail': 'taskdetail',
-                    'status': 0,
-                    'priority': 1
-                }
-            ]
-        }
-    )
+    name = request['name']
+    date = request['date']
+    task = request['task']
+
+    tasks_list = tasks_table.get_tasks_list(name, date)
+
+    if len(tasks_list) != 0:
+        tasks_table.add_task
+    else:
+        tasks_table.create_new_item(name, date, task)
+
     return {
         'statusCode': 200,
         'body': {}
@@ -50,7 +46,7 @@ def create_task(event, context):
 
 
 def update_task(event, context):
-    '''
+    """
     taskの内容を更新する
 
     下記のユーザー操作がされた際に、APIコールされる
@@ -64,7 +60,7 @@ def update_task(event, context):
         task_id: 更新するtaskのid
     :param context:
     :return:
-    '''
+    """
     tasks_table.update_item(
         Key={
             'name': event.name,
@@ -84,6 +80,14 @@ def update_task(event, context):
 
 
 def delete_task(event, context):
+    request = event['body']
+    name = request['name']
+    date = request['date']
+    task_id = request['task_id']
+
+    tasks_list = tasks_table.get_tasks_list(name, date)
+    deleted_tasks_list = filter(lambda task: task['id'] != task_id, tasks_list)
+    tasks_table.update_tasks_list(name, date, deleted_tasks_list)
 
     return {
         'statusCode': 200,

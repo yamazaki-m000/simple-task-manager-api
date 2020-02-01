@@ -26,10 +26,37 @@ def get_tasks_list(name, date):
         return []
 
 
-def create_task(name, date, task_name, task_detail):
-    tasks_list = get_tasks_list(name, date)
-    if tasks_list:
-        task = tasks_list[-1]
-        new_tasks_list = tasks_list.append({
-            'id': task.id
-        })
+def add_task(name, date, current_tasks_list, new_task):
+    tasks_table.update_item(
+        Key={
+            'name': name,
+            'date': date
+        },
+        UpdateExpression='SET tasks_list = :val1',
+        ExpressionAttributeValues={
+            ':val1': current_tasks_list.append(new_task)
+        }
+    )
+
+
+def create_new_item(name, date, task):
+    tasks_table.put_item(
+        Item={
+            'name': name,
+            'date': date,
+            'tasks_list': [task]
+        }
+    )
+
+
+def update_tasks_list(name, date, tasks_list):
+    tasks_table.update_item(
+        Key={
+            'name': name,
+            'date': date
+        },
+        UpdateExpression='SET tasks_list = :val1',
+        ExpressionAttributeValues={
+            ':val1': tasks_list
+        }
+    )
