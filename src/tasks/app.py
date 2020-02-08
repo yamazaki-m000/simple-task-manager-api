@@ -1,20 +1,31 @@
 import tasks_table
+import json
+from datetime import datetime
+from decimal import Decimal
+
+
+def expire_encoding(object):
+    if isinstance(object, datetime):
+        return object.isoformat()
+    elif isinstance(object, Decimal):
+        return float(object)
+    raise TypeError
 
 
 def get_tasks(event, context):
-    print(event)
-    print(event['queryStringParameters'])
+    query_parameter = event["queryStringParameters"]
+    print(query_parameter)
 
-    name = event['queryStringParameters']['name']
-    date = event['queryStringParameters']['date']
+    name = query_parameter["name"]
+    date = query_parameter["date"]
 
     tasks_list = tasks_table.get_tasks_list(name, date)
 
-    body = {'name': name, 'date': date, 'tasks_list': tasks_list}
+    body = {"name": name, "date": date, "tasks_list": tasks_list}
 
     return {
-        'statusCode': 200,
-        'body': body
+        "statusCode": 200,
+        "body": json.dumps(body, default=expire_encoding, ensure_ascii=False)
     }
 
 
@@ -27,21 +38,28 @@ def create_task(event, context):
     :param context:
     :return:
     """
-    request = event['body']
-    name = request['name']
-    date = request['date']
-    task = request['task']
+    request_body = json.loads(event["body"])
+    print(request_body)
 
-    tasks_list = tasks_table.get_tasks_list(name, date)
+    name = request_body["name"]
+    date = int(request_body["date"])
+    new_task = request_body["task"]
 
-    if len(tasks_list) != 0:
-        tasks_table.add_task
+    current_tasks_list = tasks_table.get_tasks_list(name, date)
+    print(current_tasks_list)
+
+    if current_tasks_list is None:
+        print("is None")
+        tasks_table.add_task(name, date, new_task)
+    elif len(current_tasks_list) != 0:
+        print("len is 0")
+        tasks_table.add_task(name, date, new_task, current_tasks_list)
     else:
-        tasks_table.create_new_item(name, date, task)
+        tasks_table.create_new_item(name, date, new_task)
 
     return {
-        'statusCode': 200,
-        'body': {}
+        "statusCode": 200,
+        "body": "{}"
     }
 
 
@@ -61,35 +79,42 @@ def update_task(event, context):
     :param context:
     :return:
     """
+    request_body = json.loads(event["body"])
+    print(request_body)
+
+    name = request_body["name"]
+    date = int(request_body["date"])
+    task = request_body["update_task"]
+
     tasks_table.update_item(
         Key={
-            'name': event.name,
-            'date': event.date
+            "name": name,
+            "date": date
         },
-        UpdateExpression='SET tasks_list = :val1',
+        UpdateExpression="SET tasks_list = :val1",
         ExpressionAttributeValues={
-            ':val1': [
-                event.update_task
-            ]
+            ":val1": [task]
         }
     )
     return {
-        'statusCode': 200,
-        'body': {}
+        "statusCode": 200,
+        "body": "{}"
     }
 
 
 def delete_task(event, context):
-    request = event['body']
-    name = request['name']
-    date = request['date']
-    task_id = request['task_id']
+    request_body = json.loads(event["body"])
+    print(request_body)
+
+    name = request_body["name"]
+    date = request_body["date"]
+    task_id = request_body["task_id"]
 
     tasks_list = tasks_table.get_tasks_list(name, date)
-    deleted_tasks_list = filter(lambda task: task['id'] != task_id, tasks_list)
+    deleted_tasks_list = filter(lambda task: task["id"] != task_id, tasks_list)
     tasks_table.update_tasks_list(name, date, deleted_tasks_list)
 
     return {
-        'statusCode': 200,
-        'body': {}
+        "statusCode": 200,
+        "body": "{}"
     }
