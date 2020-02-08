@@ -5,7 +5,7 @@
     <option name="debugHost" value="localhost" />
     <option name="environmentVariables">
       <map>
-        <entry key="env" value="dev" />
+        <entry key="dynamodb_endpoint" value="http://dynamodb:8000" />
       </map>
     </option>
     <option name="handler" />

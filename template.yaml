@@ -9,7 +9,7 @@ Description: >
 Globals:
   Function:
     Runtime: python3.7
-    Timeout: 29
+    Timeout: 200
 #    Environment:
 #      Variables:
 #        TABLE_NAME: data-table

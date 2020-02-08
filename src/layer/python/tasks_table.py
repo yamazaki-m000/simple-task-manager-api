@@ -7,6 +7,8 @@ tasks_table = dynamodb.Table("tasks")
 
 def get_tasks_list(name, date):
     print("start: get_tasks_list")
+    print("name: " + name)
+    print("date: " + str(date))
 
     response = tasks_table.get_item(Key={"name": name, "date": date})
     print(response)
@@ -19,6 +21,9 @@ def get_tasks_list(name, date):
 
 def create_task(name, date, new_task):
     print("start: create_task")
+    print("name: " + name)
+    print("date: " + str(date))
+    print("new_task: " + str(new_task))
 
     current_tasks_list = get_tasks_list(name, date)
     print(current_tasks_list)
@@ -55,18 +60,23 @@ def create_task(name, date, new_task):
 
 def update_task(name, date, task):
     print("start: update_task")
+    print("name: " + name)
+    print("date: " + str(date))
+    print("task: " + str(task))
 
     def convert_task(current_task):
         """
         現在のタスク一覧から、更新対象のタスクを割り出し、
         更新するタスクデータに変更する
         """
-        if current_task.id == task.id:
+        if current_task["id"] == task["id"]:
             return task
         return current_task
 
     current_tasks_list = get_tasks_list(name, date)
-    new_tasks_list = map(lambda current_task: convert_task(current_task), current_tasks_list)
+    print(current_tasks_list)
+    new_tasks_list = list(map(lambda current_task: convert_task(current_task), current_tasks_list))
+    print(new_tasks_list)
 
     tasks_table.update_item(
         Key={"name": name, "date": date},
@@ -77,9 +87,14 @@ def update_task(name, date, task):
 
 def delete_task(name, date, task_id):
     print("start: delete_task")
+    print("name: " + name)
+    print("date: " + str(date))
+    print("task_id: " + str(task_id))
 
     current_tasks_list = get_tasks_list(name, date)
-    new_tasks_list = filter(lambda task: task["id"] != task_id, current_tasks_list)
+    print(current_tasks_list)
+    new_tasks_list = list(filter(lambda task: task["id"] != task_id, current_tasks_list))
+    print(new_tasks_list)
 
     tasks_table.update_item(
         Key={"name": name, "date": date},

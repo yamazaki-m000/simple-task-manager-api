@@ -7,13 +7,13 @@ services:
     command: -jar DynamoDBLocal.jar -dbPath /data -sharedDb
     ports:
       - 8000:8000
-#    volumes:
-#      - ./dynamodb_data:/data
+    volumes:
+      - dynamodb_data:/data
     networks:
       - lambda_local
 
-#volumes:
-#  dynamodb_data:
+volumes:
+  dynamodb_data:
 
 networks:
   lambda_local:

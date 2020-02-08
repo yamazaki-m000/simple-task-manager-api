@@ -1,5 +1,5 @@
 import tasks_table
-import json
+import json, ast
 from datetime import datetime
 from decimal import Decimal
 
@@ -45,14 +45,14 @@ def create_task(event, context):
     :param context:
     :return:
     """
-    request_body = json.loads(event["body"])
+    request_body = json.loads(event["body"], object_pairs_hook=evalfn)
     print(request_body)
 
     name = request_body["name"]
     date = int(request_body["date"])
-    new_task = request_body["task"]
+    task = request_body["task"]
 
-    tasks_table.create_task(name, date, new_task)
+    tasks_table.create_task(name, date, task)
 
     return {
         "statusCode": 200,
@@ -82,14 +82,14 @@ def update_task(event, context):
     :param context:
     :return:
     """
-    request_body = json.loads(event["body"])
+    request_body = json.loads(event["body"], object_pairs_hook=evalfn)
     print(request_body)
 
     name = request_body["name"]
     date = int(request_body["date"])
     task = request_body["task"]
 
-    tasks_table.update_task(name, date, update_task)
+    tasks_table.update_task(name, date, task)
 
     return {
         "statusCode": 200,
@@ -109,11 +109,11 @@ def delete_task(event, context):
     :param context:
     :return:
     """
-    request_body = json.loads(event["body"])
+    request_body = json.loads(event["body"], object_pairs_hook=evalfn)
     print(request_body)
 
     name = request_body["name"]
-    date = request_body["date"]
+    date = int(request_body["date"])
     task_id = request_body["task_id"]
 
     tasks_table.delete_task(name, date, task_id)
@@ -130,3 +130,17 @@ def __expire_encoding(target_object):
     elif isinstance(target_object, Decimal):
         return float(target_object)
     raise TypeError
+
+
+def evalfn(pairs):
+    res = {}
+    for key, val in pairs:
+        try:
+            if val in {'true', 'false'}:
+                res[key] = val == 'true'
+                continue
+            else:
+                res[key] = val
+        except Exception as e:
+            res[key] = val
+    return res
