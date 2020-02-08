@@ -4,15 +4,17 @@ from datetime import datetime
 from decimal import Decimal
 
 
-def expire_encoding(object):
-    if isinstance(object, datetime):
-        return object.isoformat()
-    elif isinstance(object, Decimal):
-        return float(object)
-    raise TypeError
-
-
 def get_tasks(event, context):
+    """
+    タスク一覧を取得する
+
+    :param event:
+        queryStringParameters(object):
+            name(str): ユーザー名
+            date(int): 対象日付
+    :param context:
+    :return:
+    """
     query_parameter = event["queryStringParameters"]
     print(query_parameter)
 
@@ -25,16 +27,21 @@ def get_tasks(event, context):
 
     return {
         "statusCode": 200,
-        "body": json.dumps(body, default=expire_encoding, ensure_ascii=False)
+        "body": json.dumps(body, default=__expire_encoding, ensure_ascii=False)
     }
 
 
 def create_task(event, context):
     """
-    taskを作成する
+    タスクを作成する
 
-    その日、初のtask作成の場合、itemごとDBにputする
     :param event:
+        body(str):
+            name(str): ユーザー名
+            date(int): 対象日付
+            task(object): 作成するタスク
+                name(str): タスク名
+                detail(str): タスクの詳細
     :param context:
     :return:
     """
@@ -45,17 +52,7 @@ def create_task(event, context):
     date = int(request_body["date"])
     new_task = request_body["task"]
 
-    current_tasks_list = tasks_table.get_tasks_list(name, date)
-    print(current_tasks_list)
-
-    if current_tasks_list is None:
-        print("is None")
-        tasks_table.add_task(name, date, new_task)
-    elif len(current_tasks_list) != 0:
-        print("len is 0")
-        tasks_table.add_task(name, date, new_task, current_tasks_list)
-    else:
-        tasks_table.create_new_item(name, date, new_task)
+    tasks_table.create_task(name, date, new_task)
 
     return {
         "statusCode": 200,
@@ -73,9 +70,15 @@ def update_task(event, context):
     ・taskの優先順を変更
 
     :param event:
-        name: ユーザー名
-        date: 日付
-        task: taskデータ
+        body(str):
+            name(str): ユーザー名
+            date(int): 対象日付
+            task(object): 更新するタスク
+                id(int): タスクID
+                name(str): タスク名
+                detail(str): タスクの詳細
+                done(bool): 完了状態
+            priority_than(int): [optional] 優先度1つ下のタスクID
     :param context:
     :return:
     """
@@ -95,6 +98,17 @@ def update_task(event, context):
 
 
 def delete_task(event, context):
+    """
+    タスクを削除する
+
+    :param event:
+        body(str):
+            name(str): ユーザー名
+            date(int): 対象日付
+            task_id(int): 更新するタスクのタスクID
+    :param context:
+    :return:
+    """
     request_body = json.loads(event["body"])
     print(request_body)
 
@@ -108,3 +122,11 @@ def delete_task(event, context):
         "statusCode": 200,
         "body": "{}"
     }
+
+
+def __expire_encoding(target_object):
+    if isinstance(target_object, datetime):
+        return target_object.isoformat()
+    elif isinstance(target_object, Decimal):
+        return float(target_object)
+    raise TypeError
