@@ -75,7 +75,7 @@ def update_task(event, context):
     :param event:
         name: ユーザー名
         date: 日付
-        task_id: 更新するtaskのid
+        task: taskデータ
     :param context:
     :return:
     """
@@ -84,18 +84,10 @@ def update_task(event, context):
 
     name = request_body["name"]
     date = int(request_body["date"])
-    task = request_body["update_task"]
+    task = request_body["task"]
 
-    tasks_table.update_item(
-        Key={
-            "name": name,
-            "date": date
-        },
-        UpdateExpression="SET tasks_list = :val1",
-        ExpressionAttributeValues={
-            ":val1": [task]
-        }
-    )
+    tasks_table.update_task(name, date, update_task)
+
     return {
         "statusCode": 200,
         "body": "{}"
@@ -110,9 +102,7 @@ def delete_task(event, context):
     date = request_body["date"]
     task_id = request_body["task_id"]
 
-    tasks_list = tasks_table.get_tasks_list(name, date)
-    deleted_tasks_list = filter(lambda task: task["id"] != task_id, tasks_list)
-    tasks_table.update_tasks_list(name, date, deleted_tasks_list)
+    tasks_table.delete_task(name, date, task_id)
 
     return {
         "statusCode": 200,

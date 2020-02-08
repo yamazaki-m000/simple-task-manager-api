@@ -61,8 +61,16 @@ def create_new_item(name, date, task):
     )
 
 
-def update_tasks_list(name, date, tasks_list):
-    print("start: update_tasks_list")
+def update_task(name, date, task):
+    print("start: update_task")
+
+    def convert_tasks(current_task):
+        if current_task.id == task.id:
+            return task
+        return current_task
+
+    current_tasks_list = tasks_table.get_tasks_list(name, date)
+    new_tasks_list = map(lambda current_task: convert_tasks(current_task), current_tasks_list)
 
     tasks_table.update_item(
         Key={
@@ -71,6 +79,23 @@ def update_tasks_list(name, date, tasks_list):
         },
         UpdateExpression="SET tasks_list = :val1",
         ExpressionAttributeValues={
-            ":val1": tasks_list
+            ":val1": new_tasks_list
+        }
+    )
+
+
+def delete_task(name, date, task_id):
+    print("start: delete_task")
+    current_tasks_list = tasks_table.get_tasks_list(name, date)
+    new_tasks_list = filter(lambda task: task["id"] != task_id, current_tasks_list)
+
+    tasks_table.update_item(
+        Key={
+            "name": name,
+            "date": date
+        },
+        UpdateExpression="SET tasks_list = :val1",
+        ExpressionAttributeValues={
+            ":val1": new_tasks_list
         }
     )
