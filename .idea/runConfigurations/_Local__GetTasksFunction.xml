@@ -4,7 +4,9 @@
     <option name="regionId" value="ap-northeast-1" />
     <option name="debugHost" value="localhost" />
     <option name="environmentVariables">
-      <map />
+      <map>
+        <entry key="env" value="dev" />
+      </map>
     </option>
     <option name="handler" />
     <option name="logicalFunctionName" value="GetTasksFunction" />
