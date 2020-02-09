@@ -1,5 +1,5 @@
 import tasks_table
-import json, ast
+import json
 from datetime import datetime
 from decimal import Decimal
 
@@ -15,8 +15,10 @@ def get_tasks(event, context):
     :param context:
     :return:
     """
+    print("start lambda_handler get_tasks")
+
     query_parameter = event["queryStringParameters"]
-    print(query_parameter)
+    print("query_parameter: " + query_parameter)
 
     name = query_parameter["name"]
     date = query_parameter["date"]
@@ -24,7 +26,9 @@ def get_tasks(event, context):
     tasks_list = tasks_table.get_tasks_list(name, date)
 
     body = {"name": name, "date": date, "tasks_list": tasks_list}
+    print("response_body: " + body)
 
+    print("end lambda_handler get_tasks")
     return {
         "statusCode": 200,
         "body": json.dumps(body, default=__expire_encoding, ensure_ascii=False)
@@ -45,6 +49,8 @@ def create_task(event, context):
     :param context:
     :return:
     """
+    print("start lambda_handler create_task")
+
     request_body = json.loads(event["body"], object_pairs_hook=evalfn)
     print(request_body)
 
@@ -54,6 +60,7 @@ def create_task(event, context):
 
     tasks_table.create_task(name, date, task)
 
+    print("end lambda_handler create_task")
     return {
         "statusCode": 200,
         "body": "{}"
@@ -82,6 +89,8 @@ def update_task(event, context):
     :param context:
     :return:
     """
+    print("start lambda_handler update_task")
+
     request_body = json.loads(event["body"], object_pairs_hook=evalfn)
     print(request_body)
 
@@ -91,6 +100,7 @@ def update_task(event, context):
 
     tasks_table.update_task(name, date, task)
 
+    print("end lambda_handler update_task")
     return {
         "statusCode": 200,
         "body": "{}"
@@ -109,6 +119,8 @@ def delete_task(event, context):
     :param context:
     :return:
     """
+    print("start lambda_handler delete_task")
+
     request_body = json.loads(event["body"], object_pairs_hook=evalfn)
     print(request_body)
 
@@ -118,6 +130,7 @@ def delete_task(event, context):
 
     tasks_table.delete_task(name, date, task_id)
 
+    print("end lambda_handler delete_task")
     return {
         "statusCode": 200,
         "body": "{}"
